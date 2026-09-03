@@ -6,26 +6,43 @@ Esta é uma API de autenticação completa usando .NET 8 com Minimal API e Maria
 
 - Registro de usuários
 - Login de usuários
-- Autenticação via JWT (simplificada para demonstração)
+- Autenticação via JWT (com implementação completa)
 - Persistência em MariaDB usando Entity Framework Core
 - Migrations para criação da estrutura do banco de dados
+- Validações de dados e tratamento de exceções
+- Segurança com hash de senhas e tokens JWT
 
 ## Estrutura do Projeto
 
 ```
 AuthAPI/
 ├── Models/
-│   ├── User.cs
+│   ├── Entities/
+│   │   └── User.cs
+│   ├── AuthContext.cs
 │   ├── LoginRequest.cs
 │   ├── LoginResponse.cs
 │   └── RegisterRequest.cs
 ├── Services/
 │   ├── IAuthService.cs
 │   └── AuthService.cs
-├── Controllers/
-│   └── AuthController.cs
+├── Features/
+│   └── Auth/
+│       ├── DTOs/
+│       │   ├── LoginRequest.cs
+│       │   ├── LoginResponse.cs
+│       │   └── RegisterRequest.cs
+│       └── Endpoints/
+│           └── AuthEndpoints.cs
+├── Infrastructure/
+│   └── Data/
+│       └── AuthContext.cs
+├── Properties/
+│   └── launchSettings.json
 ├── Migrations/
-└── appsettings.json
+├── appsettings.json
+├── appsettings.Development.json
+└── Program.cs
 ```
 
 ## Tecnologias Utilizadas
@@ -35,6 +52,8 @@ AuthAPI/
 - MariaDB (via Pomelo.EntityFrameworkCore.MySql)
 - Entity Framework Core
 - Swagger/OpenAPI
+- JWT Authentication
+- SHA256 para hash de senhas
 
 ## Configuração
 
@@ -43,6 +62,12 @@ AuthAPI/
    {
      "ConnectionStrings": {
        "DefaultConnection": "Server=localhost;Database=auth_api_db;Uid=root;Pwd=sua_senha;SslMode=none;"
+     },
+     "JwtSettings": {
+       "SecretKey": "sua_chave_secreta_segura_aqui",
+       "Issuer": "AuthAPI",
+       "Audience": "AuthAPIUsers",
+       "ExpireInMinutes": 60
      }
    }
    ```
@@ -57,7 +82,7 @@ AuthAPI/
 
 ### Registro de Usuário
 ```
-POST /api/auth/register
+POST /auth/register
 {
   "username": "usuario",
   "email": "usuario@example.com",
@@ -67,7 +92,7 @@ POST /api/auth/register
 
 ### Login
 ```
-POST /api/auth/login
+POST /auth/login
 {
   "username": "usuario",
   "password": "senha123"
@@ -91,9 +116,10 @@ POST /api/auth/login
 ## Considerações de Segurança
 
 - Em produção, use bibliotecas como `System.IdentityModel.Tokens.Jwt` para geração de tokens JWT
-- Use algoritmos de hash mais seguros como BCrypt ou Argon2 para senhas
+- Use algoritmos de hash mais seguros como BCrypt ou Argon2 para senhas (atualmente implementado com SHA256)
 - Implemente validações adicionais e tratamento de exceções
 - Configure HTTPS em produção
+- Mantenha a chave secreta JWT segura e não exposta
 
 ## Próximos Passos
 
@@ -102,3 +128,6 @@ POST /api/auth/login
 3. Adicionar validações mais robustas
 4. Configurar logging
 5. Adicionar testes unitários
+6. Melhorar a segurança com BCrypt para hash de senhas
+7. Implementar políticas de autorização
+8. Adicionar documentação mais detalhada dos endpoints
