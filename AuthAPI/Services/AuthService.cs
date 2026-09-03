@@ -1,4 +1,6 @@
-using AuthAPI.Models;
+using AuthAPI.Infrastructure.Data;
+using AuthAPI.Models.Entities;
+using AuthAPI.Features.Auth.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;

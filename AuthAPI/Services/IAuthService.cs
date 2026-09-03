@@ -1,4 +1,5 @@
-using AuthAPI.Models;
+using AuthAPI.Features.Auth.DTOs;
+using AuthAPI.Models.Entities;
 
 namespace AuthAPI.Services
 {

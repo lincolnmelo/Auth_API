@@ -1,5 +1,6 @@
-using AuthAPI.Models;
+using AuthAPI.Infrastructure.Data;
 using AuthAPI.Services;
+using AuthAPI.Features.Auth.Endpoints;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,20 +30,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Rotas de autenticação
-app.MapPost("/auth/register", async (RegisterRequest request, IAuthService authService) =>
-{
-    var result = await authService.RegisterAsync(request);
-    return result ? Results.Ok(new { message = "Usuário registrado com sucesso!" }) 
-                  : Results.BadRequest(new { message = "Nome de usuário ou email já existente." });
-});
-
-app.MapPost("/auth/login", async (LoginRequest request, IAuthService authService) =>
-{
-    var response = await authService.LoginAsync(request);
-    return response != null ? Results.Ok(response) 
-                            : Results.Unauthorized();
-});
+// Mapear endpoints de autenticação
+app.MapAuthEndpoints();
 
 // Rota protegida para testar autenticação
 app.MapGet("/api/protected", () =>
