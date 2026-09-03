@@ -1,0 +1,93 @@
+# Artefatos de build
+bin/
+obj/
+*.user
+*.suo
+*.vspscc
+*.vssscc
+.vs/
+
+# Arquivos de configuração sensíveis
+appsettings.Development.json
+secrets.json
+*.secret
+*.env
+
+# Arquivos de log
+*.log
+*.log.*
+
+# Arquivos de pacotes NuGet
+packages/
+*.nuget/
+.nuget/
+project.assets.json
+project.nuget.cache
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+
+# Diretórios de publicação
+publish/
+
+# Arquivos de migração (não devem ser versionados)
+Migrations/*.Designer.cs
+Migrations/*ModelSnapshot.cs
+
+# Arquivos do Visual Studio
+*.tmp
+*.tmp.*
+*.bak
+*.old
+*.cache
+*.lock
+*.lock.json
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.vscode-test/
+
+# Arquivos de teste
+TestResults/
+*.testResult
+*.trx
+
+# Arquivos de depuração
+*.pdb
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de compilação e execução
+*.dll
+*.exe
+*.runtimeconfig.json
+*.deps.json
+*.genruntimeconfig.cache
+*.genpublishdeps.cache
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.assets.cache
+*.csproj.AssemblyReference.cache
+*.csproj.CoreCompileInputs.cache
+*.csproj.FileListAbsolute.txt
+*.csproj.Up2Date
+*.MvcApplicationPartsAssemblyInfo.cache
+*.GlobalUsings.g.cs
+*.GeneratedMSBuildEditorConfig.editorconfig
+
+# Arquivos de publicação
+*.publish.xml
+PublishOutputs.*
+
+# Arquivos de launch settings
+launchSettings.json
+
+# Arquivos de configuração do projeto
+*.csproj.user
+*.csproj.nuget.*
