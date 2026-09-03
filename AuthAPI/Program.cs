@@ -8,6 +8,8 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
 
+Log.Information("Iniciando aplicação Auth API");
+
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -38,6 +40,8 @@ builder.Host.UseSerilog((context, configuration) => configuration
 
 var app = builder.Build();
 
+Log.Information("Configurando pipeline HTTP da aplicação");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -63,5 +67,7 @@ app.MapGet("/api/protected", () =>
     return Results.Ok(new { message = "Acesso autorizado!" });
 })
 .RequireAuthorization();
+
+Log.Information("Aplicação Auth API está pronta para receber requisições");
 
 app.Run();

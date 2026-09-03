@@ -8,7 +8,6 @@ obj/
 .vs/
 
 # Arquivos de configuração sensíveis
-appsettings.Development.json
 secrets.json
 *.secret
 *.env
