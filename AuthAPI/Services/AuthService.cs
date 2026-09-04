@@ -104,7 +104,7 @@ namespace AuthAPI.Services
             };
 
             // Obter a chave secreta do appsettings.json
-            var secretKey = _configuration.GetSection("JwtSettings")["SecretKey"];
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             
             // Se não encontrar a chave no appsettings, usar uma chave padrão (não recomendado para produção)
             if (string.IsNullOrEmpty(secretKey))
@@ -116,12 +116,12 @@ namespace AuthAPI.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             // Configurar a expiração do token (por exemplo, 1 hora)
-            var expireInMinutes = _configuration.GetSection("JwtSettings")["ExpireInMinutes"];
+            var expireInMinutes = Environment.GetEnvironmentVariable("JWT_EXPIRE_IN_MINUTES");
             int expireMinutes = string.IsNullOrEmpty(expireInMinutes) ? 60 : int.Parse(expireInMinutes);
             
             var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
+                issuer: Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "AuthAPI",
+                audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "AuthAPIUsers",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(expireMinutes),
                 signingCredentials: creds);

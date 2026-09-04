@@ -8,6 +8,7 @@ obj/
 .vs/
 
 # Arquivos de configuração sensíveis
+AuthAPI/.env.local
 secrets.json
 *.secret
 *.env

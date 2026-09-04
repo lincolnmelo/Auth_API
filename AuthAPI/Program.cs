@@ -1,5 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using DotNetEnv;
+using System.IO;
+
+// Verificar se o arquivo .env.local existe antes de carregar as vari�veis de ambiente
+var envLocalPath = Path.Combine(Directory.GetCurrentDirectory(), ".env.local");
+if (File.Exists(envLocalPath))
+{
+    // Carregar vari�veis de ambiente do .env.local
+    Env.Load(envLocalPath);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +24,7 @@ Log.Information("Iniciando aplicação Auth API");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // Adicionando configurações específicas para Swagger
+    // Adicionando configura��es espec�ficas para Swagger
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "Auth API",
@@ -23,14 +33,15 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configurar o DbContext com MariaDB
+// Configurar o DbContext com MariaDB usando vari�veis do .env.local
+var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING_DB");
 builder.Services.AddDbContext<AuthAPI.Infrastructure.Data.AuthContext>(options =>
     options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(10, 5, 12)) // Versão do MariaDB
+        connectionString,
+        new MySqlServerVersion(new Version(10, 5, 12)) // Vers�o do MariaDB
     ));
 
-// Registrar serviços
+// Registrar servi�os
 builder.Services.AddScoped<AuthAPI.Services.IAuthService, AuthAPI.Services.AuthService>();
 
 // Configurar o Serilog para o host
@@ -40,7 +51,7 @@ builder.Host.UseSerilog((context, configuration) => configuration
 
 var app = builder.Build();
 
-Log.Information("Configurando pipeline HTTP da aplicação");
+Log.Information("Configurando pipeline HTTP da aplica��o");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -49,25 +60,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth API v1");
-        options.RoutePrefix = "swagger"; // Swagger será acessado em /swagger
+        options.RoutePrefix = "swagger"; // Swagger ser� acessado em /swagger
         options.DisplayRequestDuration();
-        // Adicionando configurações adicionais para evitar problemas de CORS
+        // Adicionando configura��es adicionais para evitar problemas de CORS
         options.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
     });
 }
 
 app.UseHttpsRedirection();
 
-// Mapear endpoints da autenticação
+// Mapear endpoints da autentica��o
 AuthAPI.Features.Auth.Endpoints.AuthEndpoints.MapAuthEndpoints(app);
 
-// Rota protegida para testar autenticação
+// Rota protegida para testar autentica��o
 app.MapGet("/api/protected", () =>
 {
     return Results.Ok(new { message = "Acesso autorizado!" });
 })
 .RequireAuthorization();
 
-Log.Information("Aplicação Auth API está pronta para receber requisições");
+Log.Information("Aplica��o Auth API est� pronta para receber requisi��es");
 
 app.Run();
