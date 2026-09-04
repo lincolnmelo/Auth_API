@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using DotNetEnv;
 using System.IO;
+using AuthAPI.Middlewares;
 
 // Verificar se o arquivo .env.local existe antes de carregar as vari�veis de ambiente
 var envLocalPath = Path.Combine(Directory.GetCurrentDirectory(), ".env.local");
@@ -69,10 +70,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Mapear endpoints da autentica��o
+// Usar os middlewares personalizados
+app.UseCorrelationId();
+app.UseRateLimiting();
+
+// Mapear endpoints da autenticação
 AuthAPI.Features.Auth.Endpoints.AuthEndpoints.MapAuthEndpoints(app);
 
-// Rota protegida para testar autentica��o
+// Rota protegida para testar autenticação
 app.MapGet("/api/protected", () =>
 {
     return Results.Ok(new { message = "Acesso autorizado!" });
