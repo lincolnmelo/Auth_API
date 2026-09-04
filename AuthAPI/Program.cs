@@ -43,8 +43,10 @@ builder.Services.AddScoped<AuthAPI.Services.IAuthService, AuthAPI.Services.AuthS
 // Configurar o Serilog para o host - usando a configuração do appsettings.json e garantindo o output template
 builder.Host.UseSerilog((context, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {CorrelationId} {NewLine}{Exception}")
-    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information));
+    .Enrich.FromLogContext()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {CorrelationId}] {Message:lj}{NewLine}{Exception}"));
 
 var app = builder.Build();
 
@@ -71,6 +73,8 @@ app.UseRateLimiting();
 // Configurar o Serilog
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {CorrelationId}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 
