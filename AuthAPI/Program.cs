@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
 using DotNetEnv;
 using System.IO;
@@ -48,7 +48,7 @@ builder.Host.UseSerilog((context, configuration) => configuration
 
 var app = builder.Build();
 
-Log.Information("Configurando pipeline HTTP da aplica��o");
+Log.Information("Configurando pipeline HTTP da aplicação");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -84,6 +84,6 @@ app.MapGet("/api/protected", () =>
 })
 .RequireAuthorization();
 
-Log.Information("Aplica��o Auth API est� pronta para receber requisi��es");
+Log.Information("Aplicação Auth API está pronta para receber requisições");
 
 app.Run();
