@@ -7,6 +7,7 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Serilog;
 
 namespace AuthAPI.Services
 {
@@ -23,19 +24,27 @@ namespace AuthAPI.Services
 
         public async Task<LoginResponse?> LoginAsync(LoginRequest request)
         {
+            Log.Information("Iniciando processo de login para usuário: {Username}", request.Username);
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == request.Username || u.Email == request.Username);
 
             if (user == null)
+            {
+                Log.Warning("Falha no login para usuário: {Username}, usuário não encontrado", request.Username);
                 return null;
+            }
 
             // Verificar senha (em produção, use um método mais seguro como BCrypt)
             if (!VerifyPassword(request.Password, user.PasswordHash))
+            {
+                Log.Warning("Falha no login para usuário: {Username}, credenciais inválidas", request.Username);
                 return null;
+            }
 
             // Gerar token JWT
             var token = GenerateJwtToken(user);
 
+            Log.Information("Login bem-sucedido para usuário: {Username}", request.Username);
             return new LoginResponse
             {
                 Token = token,
@@ -46,9 +55,13 @@ namespace AuthAPI.Services
 
         public async Task<bool> RegisterAsync(RegisterRequest request)
         {
+            Log.Information("Iniciando processo de registro para usuário: {Username}", request.Username);
             // Verificar se usuário já existe
             if (await _context.Users.AnyAsync(u => u.Username == request.Username || u.Email == request.Email))
+            {
+                Log.Warning("Falha no registro para usuário: {Username}, nome de usuário ou email já existente", request.Username);
                 return false;
+            }
 
             // Criptografar senha
             var passwordHash = HashPassword(request.Password);
@@ -64,16 +77,19 @@ namespace AuthAPI.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            Log.Information("Registro bem-sucedido para usuário: {Username}", request.Username);
             return true;
         }
 
         public async Task<User?> GetUserByIdAsync(int id)
         {
+            Log.Information("Buscando usuário por ID: {Id}", id);
             return await _context.Users.FindAsync(id);
         }
 
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
+            Log.Information("Buscando usuário por nome de usuário: {Username}", username);
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
@@ -119,6 +135,8 @@ namespace AuthAPI.Services
             var expireInMinutes = Environment.GetEnvironmentVariable("JWT_EXPIRE_IN_MINUTES");
             int expireMinutes = string.IsNullOrEmpty(expireInMinutes) ? 60 : int.Parse(expireInMinutes);
             
+            Log.Information("Gerando token JWT para usuário: {Username}", user.Username);
+
             var token = new JwtSecurityToken(
                 issuer: Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "AuthAPI",
                 audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "AuthAPIUsers",
@@ -126,6 +144,7 @@ namespace AuthAPI.Services
                 expires: DateTime.Now.AddMinutes(expireMinutes),
                 signingCredentials: creds);
 
+            Log.Information("Token JWT gerado com sucesso para usuário: {Username}", user.Username);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

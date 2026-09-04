@@ -30,6 +30,7 @@ public class CorrelationIdMiddleware
         // Adicionar o Correlation ID ao escopo de log do Serilog
         using (LogContext.PushProperty("CorrelationId", correlationId))
         {
+            Log.Information("Middleware executado com CorrelationId: {CorrelationId}", correlationId);
             await _next(context);
         }
     }

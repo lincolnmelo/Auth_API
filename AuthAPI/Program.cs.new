@@ -14,6 +14,11 @@ if (File.Exists(envLocalPath))
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar o Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {CorrelationId} {NewLine}{Exception}")
+    .CreateBootstrapLogger();
+
 Log.Information("Iniciando aplicação Auth API");
 
 // Add services to the container.
@@ -57,7 +62,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth API v1");
+        options.RoutePrefix = "swagger"; // Swagger ser� acessado em /swagger
         options.DisplayRequestDuration();
+        // Adicionando configura��es adicionais para evitar problemas de CORS
         options.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
     });
 }
@@ -67,12 +74,6 @@ app.UseHttpsRedirection();
 // Usar os middlewares personalizados
 app.UseCorrelationId();
 app.UseRateLimiting();
-
-// Configurar o Serilog
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {CorrelationId}] {Message:lj}{NewLine}{Exception}")
-    .CreateLogger();
 
 // Mapear endpoints da autenticação
 AuthAPI.Features.Auth.Endpoints.AuthEndpoints.MapAuthEndpoints(app);
